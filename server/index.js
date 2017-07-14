@@ -3,7 +3,6 @@ var path = require('path');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 var cors=require('cors');
-var routes = require('./routes/index');
 var api = require('./routes/api');
 var app = express();
 var env = require('dotenv').config().parsed;
@@ -14,14 +13,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 // app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
 app.use('/api', api);
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-    console.log('err')
-    var err = new Error('API is ready in /api');
-    err.status = 404;
-    next(err);
+app.use('/', function(req, res, next) {
+    res.json({"message": "API is ready in /api"});
 });
 
 // error handlers
