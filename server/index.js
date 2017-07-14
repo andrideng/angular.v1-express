@@ -1,17 +1,16 @@
 var express = require('express');
 var path = require('path');
 var logger = require('morgan');
-var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var cors=require('cors');
 var routes = require('./routes/api');
 var app = express();
+var env = require('dotenv').config().parsed;
 
 app.use(cors());
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
 // app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api', routes);
@@ -24,7 +23,6 @@ app.use(function(req, res, next) {
 });
 
 // error handlers
-console.log(app.get('env'))
 
 // development error handler
 // will print stacktrace
@@ -48,11 +46,11 @@ app.use(function(err, req, res, next) {
     });
 });
 
-app.listen(3000, function (err) {
+app.listen(env.PORT || 3000, function (err) {
     if (err) {
         console.log(err);
     } else {
-        console.log("server active in port 3000!");
+        console.log("server active in port: "+env.PORT || 3000+"!");
     }
 });
 module.exports = app;
