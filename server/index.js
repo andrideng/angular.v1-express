@@ -46,11 +46,11 @@ app.use(function(err, req, res, next) {
     });
 });
 
-app.listen(env.PORT || 3000, function (err) {
+app.listen(process.env.PORT || 3000, function (err) {
     if (err) {
         console.log(err);
     } else {
-        console.log("server active in port: "+env.PORT || 3000+"!");
+        console.log("server active in port: "+process.env.PORT || 3000+"!");
     }
 });
 module.exports = app;
