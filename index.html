@@ -17,7 +17,8 @@
             <ul class="nav nav-tabs">
                 <li class="active"><a data-toggle="pill" href="#add">Add</a></li>
                 <li><a data-toggle="pill" href="#place">Place</a></li>
-                <li><a data-toggle="pill" href="#info">Info</a></li>            
+                <li><a data-toggle="pill" href="#info">Info</a></li> 
+                <li><a data-toggle="pill" href="#export">Export</a></li>            
             </ul>
             
             <!-- div.tab-content -->
@@ -103,6 +104,12 @@
                     <div ng-if="route.length == 0"><h4>Still Empty</h4></div>
                     <div class="tab-panel" id="info-direction" ng-if="route.length != 0"></div>
                 </div>  <!-- ./div#info -->
+                <!-- div#export -->
+                <div id="export" class="tab-pane fade">
+                    <h3>Export Map</h3>
+                    <div ng-if="route.length == 0"><h4>Still Empty</h4></div>
+                    <a ng-if="route.length != 0" title="export map" ng-click="export_map()" id="export">Click to Open</a>
+                </div>  <!-- ./div#export -->
                 
             </div> <!-- ./div.tab-content -->
 

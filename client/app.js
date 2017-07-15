@@ -2,6 +2,9 @@ var app = angular.module('app', ['ngMap']);
 
 app.controller('AppCtrl', function($scope, $http) {
    const apiUrl = "https://etobee-tech-test.herokuapp.com/api";
+   const staticMapUrl = "http://maps.googleapis.com/maps/api/staticmap?key=AIzaSyDtP6A3_Jqg40EnmdzFARTtq35ihreFOqQ&size=1024x1024&";
+   var exportUrl = "";
+
    $scope.places = [];
    // call api to get all stored places
    $http.get(apiUrl+'/places').then(function(res){
@@ -54,7 +57,7 @@ app.controller('AppCtrl', function($scope, $http) {
    $scope.wayPoints = [];
    $scope.destination = { lat: 0, lng: 0 };
    $scope.$watchCollection('route', function() {
-
+      $scope.pointer = "";
       // clear info-map
       $('#info-direction').children().remove();
       if($scope.route.length > 1) {
@@ -91,22 +94,47 @@ app.controller('AppCtrl', function($scope, $http) {
 
    });
 
-   
 
    $scope.$watchCollection('map.directionsRenderers[0].directions.routes[0].legs', function(maps) {
       $scope.total = 0;
       $scope.time = 0;
+      $scope.path = "";
       angular.forEach(maps, function(map) {
-         // console.log(map.distance.value)
+         // calculate total distance
          var tmpTotal = map.distance.text.split(" ");
          $scope.total += parseFloat(tmpTotal[0]);
+         // calculate time duration
          var tmpTime = map.duration.text.split(" ");
          $scope.time += parseInt(tmpTime[0]);
+
+         var stepLength = map.steps.length;
+         var i = 0;
+         angular.forEach(map.steps, function(step) {
+            
+            $scope.path += parseFloat(step.start_location.lat()).toFixed(6)+","+parseFloat(step.start_location.lng()).toFixed(6);
+            if( i != stepLength-1 ) $scope.path += "|";
+            i++;
+         });
       });
-      // $scope.total /= 1000;
-      // $scope.time /= 60;
-      // console.log($scope.total)
+
+      exportUrl = "";
+      for (var i = 0; i < $scope.route.length; i++) {
+         $scope.pointer += "markers=color:red|" + $scope.route[i].lat+","+$scope.route[i].lng;
+
+         if(i!=$scope.route.length-1) $scope.pointer+="&";
+      }
+
+      exportUrl = staticMapUrl + $scope.pointer;
+      // console.log(staticMapUrl);
+      
+      exportUrl += "&path=color:0xff0000ff|weight:5|" + $scope.path;
+      // $('#export').attr('href', exportUrl);
+      // console.log(exportUrl)
    });
+
+   $scope.export_map = function() {
+      window.open(exportUrl, '_blank');
+   }
 
    $scope.destroy = function(place) {
       var deleteUser = window.confirm('delete?');
