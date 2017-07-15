@@ -1,0 +1,190 @@
+var app = angular.module('app', ['ngMap']);
+
+app.controller('AppCtrl', function($scope, $http) {
+   const apiUrl = "https://etobee-tech-test.herokuapp.com/api";
+   $scope.places = [];
+   // call api to get all stored places
+   $http.get(apiUrl+'/places').then(function(res){
+      $scope.places = res.data;
+
+      angular.forEach($scope.places, function(obj){
+         obj.status = false;
+      });
+
+      // console.log($scope.places)
+   });
+
+   $scope.getpos = function (event) {
+      $('input[name="lat"]').val(event.latLng.lat);
+      $('input[name="lng"]').val(event.latLng.lng);
+   }
+
+   // make custom icon
+   $scope.customIcon = {
+      "scaledSize": [32, 32],
+      "url": "https://asteeza.com/wp-content/uploads/marker-256.png"
+   };
+
+   // init route list
+   $scope.route = [];
+   // init center position
+   // lat, lng in jakarta
+   $scope.center = [-6.21462, 106.84513];
+
+   // add route to route list
+   $scope.routing = function(place) {
+      $scope.route.push(place);
+      place.status = true;
+
+      // console.log($scope.route)
+   }
+
+   // remove route from route list
+   $scope.remove = function(place) {
+      for(var i = 0 ; i < $scope.route.length ; i++) {
+         if($scope.route[i].id == place.id) {
+            $scope.route.splice(i, 1);
+            place.status = false;
+         }
+      }
+      if($scope.route.length == 0) $('.info-map').children().remove();
+   }
+
+   $scope.origin = { lat: 0, lng: 0 };
+   $scope.wayPoints = [];
+   $scope.destination = { lat: 0, lng: 0 };
+   $scope.$watchCollection('route', function() {
+
+      // clear info-map
+      $('#info-direction').children().remove();
+      if($scope.route.length > 1) {
+         // origin
+         $scope.origin.lat = $scope.route[0].lat;
+         $scope.origin.lng = $scope.route[0].lng;
+
+         $scope.wayPoints = [];
+         if($scope.route.length > 1) {
+
+            for (var i = 1; i < $scope.route.length - 1; i++) {
+
+               var obj = {
+                  location: {
+                     lat: parseFloat($scope.route[i].lat),
+                     lng: parseFloat($scope.route[i].lng)
+                  },
+                  stopover: true
+               };
+               $scope.wayPoints.push(obj);
+
+            }
+         }
+
+         // destination
+         $scope.destination.lat = $scope.route[$scope.route.length-1].lat;
+         $scope.destination.lng = $scope.route[$scope.route.length-1].lng;
+
+      }
+      else {
+         $scope.origin = {};
+         $scope.destination = {};
+      }
+
+   });
+
+   
+
+   $scope.$watchCollection('map.directionsRenderers[0].directions.routes[0].legs', function(maps) {
+      $scope.total = 0;
+      $scope.time = 0;
+      angular.forEach(maps, function(map) {
+         // console.log(map.distance.value)
+         var tmpTotal = map.distance.text.split(" ");
+         $scope.total += parseFloat(tmpTotal[0]);
+         var tmpTime = map.duration.text.split(" ");
+         $scope.time += parseInt(tmpTime[0]);
+      });
+      // $scope.total /= 1000;
+      // $scope.time /= 60;
+      // console.log($scope.total)
+   });
+
+   $scope.destroy = function(place) {
+      var deleteUser = window.confirm('delete?');
+      place.status = false;
+      if(deleteUser) {
+         $http.delete(apiUrl+'/places/'+place.id, {params: {id: place.id}})
+             .then(function(res) {
+                // alert('success delete!')
+                // console.log(res);
+
+                for(var i = 0 ; i < $scope.places.length ; i++) {
+                   if($scope.places[i].id == place.id) {
+                      $scope.places.splice(i, 1);
+
+                      window.setTimeout(function() {
+                         $scope.$apply();
+                      }, 100);
+                   }
+                }
+
+             });
+      }
+
+   }
+
+   // handle submit form
+   $scope.submit = function(event) {
+      event.preventDefault();
+
+      $http({
+         method: 'POST',
+         url: apiUrl+'/places',
+         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+         transformRequest: function(obj) {
+            var str = [];
+            for(var p in obj)
+               str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+            return str.join("&");
+         },
+         data: {
+            id: generateUUID(),
+            name: $('input[name="name"]').val(),
+            lat: $('input[name="lat"]').val(),
+            lng: $('input[name="lng"]').val(),
+            address: $('textarea[name="formatted_address"]').val()
+         }
+      }).then(function (res) {
+         // console.log(res)
+         $scope.places.push(res.data);
+
+         //empty all input
+         $('input[name="autocomplete"]').val('');
+         $('input[name="name"]').val('');
+         $('input[name="lat"]').val('');
+         $('input[name="lng"]').val('');
+         $('textarea[name="formatted_address"]').val('');
+
+         // alert user with success
+         alert('Success Insert!');
+
+         // refresh map
+         window.setTimeout(function() {
+            $scope.$apply();
+         }, 100);
+         // location.reload()
+      });
+
+   }
+
+   // generate uuid for new id
+   function generateUUID() {
+      var d = new Date().getTime();
+      var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+         var r = (d + Math.random()*16)%16 | 0;
+         d = Math.floor(d/16);
+         return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+      });
+      return uuid;
+   };
+
+});
