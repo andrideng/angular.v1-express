@@ -2,7 +2,7 @@
   "name": "etobee-tech-test",
   "version": "0.0.1",
   "scripts": {
-    "start": "node server/index.js"
+    "start": "node index.js"
   },
   "dependencies": {
     "body-parser": "~1.12.0",
