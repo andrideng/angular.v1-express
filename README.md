@@ -1,12 +1,27 @@
-# etobee-tech-test
+# ETOBEE - TECHNICAL - TEST
 
-## Server route
-List of Route:
+## INTRODUCTION
 
-https://etobee-tech-test.herokuapp.com/api
+API URL: https://etobee-tech-test.herokuapp.com/api
+WEB URL: https://etobee.andrideng.com/
 
-https://etobee-tech-test.herokuapp.com/api/places
+## API ENDPOINTS
+
+[GET] https://etobee-tech-test.herokuapp.com/api
+
+[GET] https://etobee-tech-test.herokuapp.com/api/places
 
 [POST] https://etobee-tech-test.herokuapp.com/api/places
+Path Parameters:
+name    - string 
+lat     - string
+lng     - string
+address - string
 
 [DELETE] https://etobee-tech-test.herokuapp.com/api/places/:id
+Path Parameters:
+id    - string (uuid)
+
+## COPYRIGHT 2017
+
+Creator: https://andrideng.com
