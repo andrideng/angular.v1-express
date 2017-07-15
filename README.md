@@ -2,6 +2,12 @@
 
 ## INTRODUCTION
 
+Front End : AngularJS
+
+Back End : Express
+
+Database : MySQL
+
 API URL: https://etobee-tech-test.herokuapp.com/api
 
 WEB URL: https://etobee.andrideng.com/
