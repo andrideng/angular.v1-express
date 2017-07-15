@@ -3,6 +3,7 @@ var router = express.Router();
 var Place = require('../models/Place');
 
 router.get('/',function(req,res,next){
+    console.log('here')
     res.json({"message": "etobee-technical-test"});
 });
 

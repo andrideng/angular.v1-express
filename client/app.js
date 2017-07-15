@@ -2,7 +2,9 @@ var app = angular.module('app', ['ngMap']);
 
 app.controller('AppCtrl', function($scope, $http) {
    const apiUrl = "https://etobee-tech-test.herokuapp.com/api";
+   const apiMapUrl = "https://maps.googleapis.com/maps/api/directions/json?key=AIzaSyDtP6A3_Jqg40EnmdzFARTtq35ihreFOqQ&mode=driving&";
    const staticMapUrl = "http://maps.googleapis.com/maps/api/staticmap?key=AIzaSyDtP6A3_Jqg40EnmdzFARTtq35ihreFOqQ&size=1024x1024&";
+   var apiMap = "";
    var exportUrl = "";
 
    $scope.places = [];
@@ -53,11 +55,12 @@ app.controller('AppCtrl', function($scope, $http) {
       if($scope.route.length == 0) $('.info-map').children().remove();
    }
 
+   $scope.routeWaypoints = "";
    $scope.origin = { lat: 0, lng: 0 };
    $scope.wayPoints = [];
    $scope.destination = { lat: 0, lng: 0 };
    $scope.$watchCollection('route', function() {
-      $scope.pointer = "";
+      $scope.routeWaypoints = "";
       // clear info-map
       $('#info-direction').children().remove();
       if($scope.route.length > 1) {
@@ -69,7 +72,8 @@ app.controller('AppCtrl', function($scope, $http) {
          if($scope.route.length > 1) {
 
             for (var i = 1; i < $scope.route.length - 1; i++) {
-
+               $scope.routeWaypoints += $scope.route[i].lat+","+$scope.route[i].lng;
+               if( i != $scope.route.length - 1 ) $scope.routeWaypoints += "|";
                var obj = {
                   location: {
                      lat: parseFloat($scope.route[i].lat),
@@ -117,6 +121,11 @@ app.controller('AppCtrl', function($scope, $http) {
          });
       });
 
+      // origin=Boston,MA&destination=Concord,MA&waypoints=Charlestown,MA
+      apiMap = apiMapUrl + "origin="+$scope.origin.lat+","+$scope.origin.lng+"&destination="+$scope.destination.lat+","+$scope.destination.lng;
+
+      if($scope.routeWaypoints != "") apiMap += "&waypoints="+$scope.routeWaypoints;
+
       exportUrl = "";
       for (var i = 0; i < $scope.route.length; i++) {
          $scope.pointer += "markers=color:red|" + $scope.route[i].lat+","+$scope.route[i].lng;
@@ -127,7 +136,8 @@ app.controller('AppCtrl', function($scope, $http) {
       exportUrl = staticMapUrl + $scope.pointer;
       // console.log(staticMapUrl);
       
-      exportUrl += "&path=color:0xff0000ff|weight:5|" + $scope.path;
+      exportUrl += "&path=color:0xff0000ff|weight:5|" + $scope.path + '&sensor=false';
+
       // $('#export').attr('href', exportUrl);
       // console.log(exportUrl)
    });
