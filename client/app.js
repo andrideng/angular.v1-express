@@ -136,6 +136,7 @@ app.controller('AppCtrl', function($scope, $http) {
       window.open(exportUrl, '_blank');
    }
 
+   // delete place in database
    $scope.destroy = function(place) {
       var deleteUser = window.confirm('delete?');
       place.status = false;
