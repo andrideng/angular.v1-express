@@ -10,7 +10,7 @@ Database : MySQL
 
 API URL: https://etobee-tech-test.herokuapp.com/api
 
-WEB URL: https://etobee.andrideng.com/
+WEB URL: https://etobee-tech-test.herokuapp.com/
 
 ## API ENDPOINTS
 
