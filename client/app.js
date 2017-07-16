@@ -102,9 +102,10 @@ app.controller('AppCtrl', function($scope, $http) {
 
             $http.get(apiUrl + '/routing/'+apiMap)
                .then(function(res) {
-                  // console.log(res.data)
-
-                  $scope.points = res.data;
+                  
+                  var new_points = res.data.replace("\\\\", "\\");
+                  // console.log(new_points)
+                  $scope.points = new_points;
                })
             
          }
