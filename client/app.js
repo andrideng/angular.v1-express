@@ -5,8 +5,8 @@ app.controller('AppCtrl', function($scope, $http) {
    const apiUrl = "https://etobee-tech-test.herokuapp.com/api";
    const apiMapUrl = "https://maps.googleapis.com/maps/api/directions/json?key=AIzaSyDtP6A3_Jqg40EnmdzFARTtq35ihreFOqQ&mode=driving&";
    const staticMapUrl = "http://maps.googleapis.com/maps/api/staticmap?key=AIzaSyDtP6A3_Jqg40EnmdzFARTtq35ihreFOqQ&size=1024x1024&";
-   var apiMap = "";
-   var exportUrl = "";
+   $scope.apiMap = "";
+   $scope.exportUrl = "";
 
    $scope.places = [];
    // call api to get all stored places
@@ -95,12 +95,13 @@ app.controller('AppCtrl', function($scope, $http) {
 
           // origin=Boston,MA&destination=Concord,MA&waypoints=Charlestown,MA
          if($scope.route.length > 1) {
+            $scope.apiMap = "";
             //apiMapUrl +
-            apiMap =  "origin="+$scope.origin.lat+","+$scope.origin.lng+"&destination="+$scope.destination.lat+","+$scope.destination.lng;
+            $scope.apiMap =  "origin="+$scope.origin.lat+","+$scope.origin.lng+"&destination="+$scope.destination.lat+","+$scope.destination.lng;
 
             if($scope.routeWaypoints != "") apiMap += "&waypoints="+$scope.routeWaypoints;
 
-            $http.get(apiUrl + '/routing/'+apiMap)
+            $http.get(apiUrl + '/routing/'+$scope.apiMap)
                .then(function(res) {
                   
                   var new_points = res.data.replace("\\\\", "\\");
@@ -145,17 +146,17 @@ app.controller('AppCtrl', function($scope, $http) {
       });
 
 
-      exportUrl = "";
+      $scope.exportUrl = "";
       for (var i = 0; i < $scope.route.length; i++) {
          $scope.pointer += "markers=color:red|" + $scope.route[i].name;
 
          if(i!=$scope.route.length-1) $scope.pointer+="&";
       }
 
-      exportUrl = staticMapUrl + $scope.pointer;
+      $scope.exportUrl = staticMapUrl + $scope.pointer;
       // console.log(staticMapUrl);
       
-      exportUrl += "&path=color:0xff0000ff|weight:5|enc:" + $scope.points + '&sensor=false';
+      $scope.exportUrl += "&path=color:0xff0000ff|weight:5|" + $scope.path + '&sensor=false';
 
       // $('#export').attr('href', exportUrl);
       // console.log(exportUrl)
@@ -163,7 +164,7 @@ app.controller('AppCtrl', function($scope, $http) {
    });
 
    $scope.export_map = function() {
-      window.open(exportUrl, '_blank');
+      window.open($scope.exportUrl, '_blank');
    }
 
    // delete place in database
