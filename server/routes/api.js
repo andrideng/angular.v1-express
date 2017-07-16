@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var Place = require('../models/Place');
 var curl = require('curlrequest');
+var env = require('dotenv').config().parsed;
 
 // 'https://maps.googleapis.com/maps/api/directions/json?key=AIzaSyDtP6A3_Jqg40EnmdzFARTtq35ihreFOqQ&mode=driving&origin=-6.1351784466311,106.81328773498535&destination=-6.2002291,106.78538679999997'
 
@@ -11,7 +12,7 @@ router.get('/',function(req,res,next){
 });
 
 router.get('/routing/:url',function(req,res, next) {
-    var static = 'https://maps.googleapis.com/maps/api/directions/json?key=AIzaSyDtP6A3_Jqg40EnmdzFARTtq35ihreFOqQ&mode=driving&';
+    var static = 'https://maps.googleapis.com/maps/api/directions/json?key='+process.env.GAPI+'&mode=driving&';
     
     var url = static+req.params.url;
     curl.request({url:url}, function (err, data) {
