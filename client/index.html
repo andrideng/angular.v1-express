@@ -94,7 +94,6 @@
                         Total Distance : About {{total}} km <br>
                         Cost Time : About {{time}} min
                         <div ng-repeat="a in map.directionsRenderers[0].directions.routes[0].legs">
-                            {{a.distance.text | split:' ':0}}
                         </div>
                     </p>
                 </div>  <!-- ./div#place -->

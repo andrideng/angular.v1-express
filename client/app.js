@@ -1,6 +1,7 @@
 var app = angular.module('app', ['ngMap']);
 
 app.controller('AppCtrl', function($scope, $http) {
+
    const apiUrl = "https://etobee-tech-test.herokuapp.com/api";
    const apiMapUrl = "https://maps.googleapis.com/maps/api/directions/json?key=AIzaSyDtP6A3_Jqg40EnmdzFARTtq35ihreFOqQ&mode=driving&";
    const staticMapUrl = "http://maps.googleapis.com/maps/api/staticmap?key=AIzaSyDtP6A3_Jqg40EnmdzFARTtq35ihreFOqQ&size=1024x1024&";
@@ -55,6 +56,8 @@ app.controller('AppCtrl', function($scope, $http) {
       if($scope.route.length == 0) $('.info-map').children().remove();
    }
 
+   $scope.points = "";
+   $scope.path = "";
    $scope.routeWaypoints = "";
    $scope.origin = { lat: 0, lng: 0 };
    $scope.wayPoints = [];
@@ -90,6 +93,24 @@ app.controller('AppCtrl', function($scope, $http) {
          $scope.destination.lat = $scope.route[$scope.route.length-1].lat;
          $scope.destination.lng = $scope.route[$scope.route.length-1].lng;
 
+          // origin=Boston,MA&destination=Concord,MA&waypoints=Charlestown,MA
+         if($scope.route.length > 1) {
+            //apiMapUrl +
+            apiMap =  "origin="+$scope.origin.lat+","+$scope.origin.lng+"&destination="+$scope.destination.lat+","+$scope.destination.lng;
+
+            if($scope.routeWaypoints != "") apiMap += "&waypoints="+$scope.routeWaypoints;
+
+            $http.get('http://localhost:4000/api/routing/'+apiMap)
+               .then(function(res) {
+                  // console.log(res.data)
+
+                  $scope.points = res.data;
+               })
+            
+         }
+
+         
+
       }
       else {
          $scope.origin = {};
@@ -99,6 +120,7 @@ app.controller('AppCtrl', function($scope, $http) {
    });
 
 
+   // calculate distance and duration
    $scope.$watchCollection('map.directionsRenderers[0].directions.routes[0].legs', function(maps) {
       $scope.total = 0;
       $scope.time = 0;
@@ -121,14 +143,10 @@ app.controller('AppCtrl', function($scope, $http) {
          });
       });
 
-      // origin=Boston,MA&destination=Concord,MA&waypoints=Charlestown,MA
-      apiMap = apiMapUrl + "origin="+$scope.origin.lat+","+$scope.origin.lng+"&destination="+$scope.destination.lat+","+$scope.destination.lng;
-
-      if($scope.routeWaypoints != "") apiMap += "&waypoints="+$scope.routeWaypoints;
 
       exportUrl = "";
       for (var i = 0; i < $scope.route.length; i++) {
-         $scope.pointer += "markers=color:red|" + $scope.route[i].lat+","+$scope.route[i].lng;
+         $scope.pointer += "markers=color:red|" + $scope.route[i].name;
 
          if(i!=$scope.route.length-1) $scope.pointer+="&";
       }
@@ -136,10 +154,11 @@ app.controller('AppCtrl', function($scope, $http) {
       exportUrl = staticMapUrl + $scope.pointer;
       // console.log(staticMapUrl);
       
-      exportUrl += "&path=color:0xff0000ff|weight:5|" + $scope.path + '&sensor=false';
+      exportUrl += "&path=color:0xff0000ff|weight:5|enc:" + $scope.points + '&sensor=false';
 
       // $('#export').attr('href', exportUrl);
       // console.log(exportUrl)
+
    });
 
    $scope.export_map = function() {
