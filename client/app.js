@@ -100,7 +100,7 @@ app.controller('AppCtrl', function($scope, $http) {
 
             if($scope.routeWaypoints != "") apiMap += "&waypoints="+$scope.routeWaypoints;
 
-            $http.get('http://localhost:4000/api/routing/'+apiMap)
+            $http.get(apiUrl + '/routing/'+apiMap)
                .then(function(res) {
                   // console.log(res.data)
 
